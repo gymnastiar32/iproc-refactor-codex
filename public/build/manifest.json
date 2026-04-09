@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-CozZ4xOS.css",
+    "file": "assets/app-QgDmuG67.css",
     "name": "home",
     "names": [
       "app.css",
@@ -12,7 +12,7 @@
     "isEntry": true
   },
   "resources/css/pages/cloud.css": {
-    "file": "assets/app-CozZ4xOS.css",
+    "file": "assets/app-QgDmuG67.css",
     "name": "home",
     "names": [
       "app.css",
@@ -24,7 +24,7 @@
     "isEntry": true
   },
   "resources/css/pages/home.css": {
-    "file": "assets/app-CozZ4xOS.css",
+    "file": "assets/app-QgDmuG67.css",
     "name": "home",
     "names": [
       "app.css",
@@ -36,7 +36,7 @@
     "isEntry": true
   },
   "resources/css/pages/two-go.css": {
-    "file": "assets/app-CozZ4xOS.css",
+    "file": "assets/app-QgDmuG67.css",
     "name": "home",
     "names": [
       "app.css",
