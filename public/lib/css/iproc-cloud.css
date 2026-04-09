@@ -1,0 +1,41 @@
+.hero {
+    background-image: url("../img/background-hero.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: top center;
+}
+
+.solve {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(72, 172, 225, 0.20) 100%), #FFF;
+}
+
+.desk {
+    background-image: url("../img/iproc-2-go/background-bottom.png");
+    background-color: #005db5;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: bottom center;
+}
+
+.why-iproc {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.20) 0%, rgba(72, 172, 225, 0.20) 100%), #FFF;
+}
+
+.feature {
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.20) 0%, rgba(72, 172, 225, 0.20) 100%), #FFF;
+}
+
+.bottom>div {
+    background-image: url("../img/iproc-2-go/background-bottom.png");
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-color: #005db5;
+    background-position: bottom;
+}
+
+footer {
+    background-image: url("../img/background-hero.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: top center;
+}

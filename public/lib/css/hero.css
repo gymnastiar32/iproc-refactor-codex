@@ -1,0 +1,10 @@
+.hero {
+    background-image: url("../img/background-hero.png");
+    background-repeat: no-repeat;
+    background-position: top center;
+    background-size: contain;
+}
+
+iframe {
+    aspect-ratio: 16 / 9;
+}

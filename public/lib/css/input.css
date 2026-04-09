@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@plugin "flowbite/plugin";
+@source "../../node_modules/flowbite";
+
+@layer base {
+    .bg-primary {
+        background-color: #005db5;
+    }
+}
