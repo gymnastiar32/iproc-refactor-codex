@@ -7,7 +7,7 @@
                     vendor management, and procurement for greater efficiency and transparency.
                 </p>
                 <div class="relative px-0 md:px-15!">
-                    <div class="award-slider">
+                    <div class="award-slider flex gap-2 md:gap-8!">
                         <div class="rounded-lg bg-linear-[0deg,#00000033,#00000000] relative">
                             <img loading="lazy" class="w-full rounded-lg relative z-[-1]" src="/lib/img/image 250.png"
                                 alt="International APICTA 2010 Awards">
