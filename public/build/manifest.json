@@ -1,0 +1,56 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-CozZ4xOS.css",
+    "name": "home",
+    "names": [
+      "app.css",
+      "home.css",
+      "cloud.css",
+      "two-go.css"
+    ],
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/css/pages/cloud.css": {
+    "file": "assets/app-CozZ4xOS.css",
+    "name": "home",
+    "names": [
+      "app.css",
+      "home.css",
+      "cloud.css",
+      "two-go.css"
+    ],
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/css/pages/home.css": {
+    "file": "assets/app-CozZ4xOS.css",
+    "name": "home",
+    "names": [
+      "app.css",
+      "home.css",
+      "cloud.css",
+      "two-go.css"
+    ],
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/css/pages/two-go.css": {
+    "file": "assets/app-CozZ4xOS.css",
+    "name": "home",
+    "names": [
+      "app.css",
+      "home.css",
+      "cloud.css",
+      "two-go.css"
+    ],
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-BU6mFzGd.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}
