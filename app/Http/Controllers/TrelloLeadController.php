@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 class TrelloLeadController extends Controller
@@ -77,27 +79,52 @@ class TrelloLeadController extends Controller
         }
 
         $config = config('services.trello_lead');
+        $data = $this->extractRequestData($request);
+
+        if (! empty($data['website'] ?? '')) {
+            $this->logBackup('warning', 'iProc Cloud honeypot triggered', [
+                'submission_id' => (string) Str::uuid(),
+                'logged_at' => $this->logTimestamp(),
+                'logged_date' => $this->logDate(),
+                'logged_time' => $this->logTime(),
+                'form_name' => 'iproc_cloud_lead',
+                'request_meta' => $this->requestMeta($request),
+            ]);
+
+            return response()->json(['ok' => true], 200, $this->corsHeaders());
+        }
+
+        $payload = $this->normalizePayload($data);
+        $submissionId = (string) Str::uuid();
+
+        $this->logBackup('info', 'iProc Cloud form received', $this->backupContext(
+            $submissionId,
+            $request,
+            $payload
+        ));
 
         if (blank($config['key'] ?? null) || blank($config['token'] ?? null) || blank($config['list'] ?? null)) {
+            $this->logBackup('error', 'Trello config missing for iProc Cloud lead', $this->backupContext(
+                $submissionId,
+                $request,
+                $payload
+            ));
+
             return response()->json([
                 'error' => 'Trello lead config is missing',
             ], 500, $this->corsHeaders());
         }
 
-        $data = $request->json()->all();
-
-        if (! is_array($data) || $data === []) {
-            $data = $request->all();
-        }
-
-        if (! empty($data['website'] ?? '')) {
-            return response()->json(['ok' => true], 200, $this->corsHeaders());
-        }
-
-        $payload = $this->normalizePayload($data);
         $errors = $this->validatePayload($payload);
 
         if ($errors !== []) {
+            $this->logBackup('warning', 'iProc Cloud form validation failed', $this->backupContext(
+                $submissionId,
+                $request,
+                $payload,
+                ['validation_errors' => $errors]
+            ));
+
             return response()->json([
                 'error' => 'Validasi gagal',
                 'details' => $errors,
@@ -108,6 +135,17 @@ class TrelloLeadController extends Controller
             [$cardId, $cardUrl] = $this->createCard($payload, $config);
             $warnings = $this->syncCustomFields($cardId, $payload, $config);
 
+            $this->logBackup('info', 'iProc Cloud lead sent to Trello', $this->backupContext(
+                $submissionId,
+                $request,
+                $payload,
+                [
+                    'trello_card_id' => $cardId,
+                    'trello_card_url' => $cardUrl,
+                    'custom_field_warnings' => $warnings,
+                ]
+            ));
+
             return response()->json([
                 'ok' => true,
                 'cardId' => $cardId,
@@ -115,6 +153,13 @@ class TrelloLeadController extends Controller
                 'customFieldWarnings' => $warnings,
             ], 200, $this->corsHeaders());
         } catch (\Throwable $exception) {
+            $this->logBackup('error', 'Failed sending iProc Cloud lead to Trello', $this->backupContext(
+                $submissionId,
+                $request,
+                $payload,
+                ['exception_message' => $exception->getMessage()]
+            ));
+
             return response()->json([
                 'error' => 'Trello error',
                 'message' => $exception->getMessage(),
@@ -150,6 +195,60 @@ class TrelloLeadController extends Controller
             'permintaan' => trim((string) ($data['permintaan'] ?? '')),
             'consent' => trim((string) ($data['consent'] ?? '')),
         ];
+    }
+
+    private function extractRequestData(Request $request): array
+    {
+        $data = $request->json()->all();
+
+        if (! is_array($data) || $data === []) {
+            $data = $request->all();
+        }
+
+        return is_array($data) ? $data : [];
+    }
+
+    private function backupContext(string $submissionId, Request $request, array $payload, array $extra = []): array
+    {
+        return array_merge([
+            'submission_id' => $submissionId,
+            'logged_at' => $this->logTimestamp(),
+            'logged_date' => $this->logDate(),
+            'logged_time' => $this->logTime(),
+            'form_name' => 'iproc_cloud_lead',
+            'payload' => $payload,
+            'request_meta' => $this->requestMeta($request),
+        ], $extra);
+    }
+
+    private function requestMeta(Request $request): array
+    {
+        return [
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'referer' => $request->headers->get('referer'),
+            'path' => $request->path(),
+        ];
+    }
+
+    private function logBackup(string $level, string $message, array $context): void
+    {
+        Log::channel('iproc_cloud_forms')->{$level}($message, $context);
+    }
+
+    private function logTimestamp(): string
+    {
+        return now()->setTimezone('Asia/Jakarta')->toIso8601String();
+    }
+
+    private function logDate(): string
+    {
+        return now()->setTimezone('Asia/Jakarta')->format('Y-m-d');
+    }
+
+    private function logTime(): string
+    {
+        return now()->setTimezone('Asia/Jakarta')->format('H:i:s');
     }
 
     private function validatePayload(array $payload): array

@@ -73,6 +73,14 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'iproc_cloud_forms' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/iproc-cloud-forms.log'),
+            'level' => env('IPROC_CLOUD_FORM_LOG_LEVEL', 'info'),
+            'days' => env('IPROC_CLOUD_FORM_LOG_DAYS', 30),
+            'replace_placeholders' => true,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
