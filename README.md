@@ -1,58 +1,255 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# iProc Landing App
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Website public untuk ekosistem iProc yang berfungsi sebagai landing page utama, halaman produk `iProc Cloud`, halaman produk `iProc 2Go`, halaman kebijakan privasi, serta endpoint lead form yang terintegrasi ke Trello.
 
-## About Laravel
+Dokumentasi tambahan:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- [Arsitektur Aplikasi](docs/ARCHITECTURE.md)
+- [Panduan Deployment](docs/DEPLOYMENT.md)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Ringkasan
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Project ini dibangun menggunakan Laravel 13 sebagai backend web server dan Blade sebagai template engine. Sebagian besar halaman bersifat content-driven dan dirender di server, sementara interaktivitas frontend ditangani oleh JavaScript ringan dan asset statis.
 
-## Learning Laravel
+Fitur utama:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Landing page bilingual untuk homepage dan halaman produk
+- Routing bahasa default `en` dan prefix `/id` untuk Bahasa Indonesia
+- Integrasi lead form `iProc Cloud` ke Trello
+- Logging khusus untuk submission form
+- Asset pipeline berbasis Vite dan Tailwind CSS v4
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Tech Stack
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+| Layer | Teknologi |
+| --- | --- |
+| Backend | PHP 8.3+, Laravel 13 |
+| Templating | Blade |
+| Frontend build | Vite 8 |
+| CSS | Tailwind CSS 4 |
+| HTTP client | Laravel HTTP Client |
+| Integrasi eksternal | Trello API |
+| Database default | SQLite |
+| Logging | Laravel Logging, daily file log |
+| Utility frontend | jQuery, Flowbite, AOS, Tiny Slider |
 
-## Agentic Development
+## Arsitektur Singkat
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Secara umum aplikasi ini mengikuti pola server-rendered web app:
 
-```bash
-composer require laravel/boost --dev
+1. Request masuk ke Laravel.
+2. Middleware `SetLocale` menentukan locale berdasarkan URL.
+3. Middleware `ApplyTranslations` menerapkan translasi berbasis atribut `data-i18n`.
+4. Route mengarahkan request ke Blade view statis atau ke `TrelloLeadController`.
+5. Untuk lead form, controller melakukan validasi, logging, lalu mengirim data ke Trello.
 
-php artisan boost:install
+Alur sederhananya:
+
+```mermaid
+flowchart LR
+    A["Browser"] --> B["Laravel Routes"]
+    B --> C["Web Middleware"]
+    C --> D["Blade Views"]
+    C --> E["TrelloLeadController"]
+    E --> F["Trello API"]
+    E --> G["storage/logs/iproc-cloud-forms-YYYY-MM-DD.log"]
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Penjelasan detail tersedia di [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-## Contributing
+## Struktur Direktori
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```text
+app/
+  Http/
+    Controllers/
+    Middleware/
+bootstrap/
+config/
+database/
+docs/
+lang/
+public/
+  lib/
+resources/
+  css/
+  js/
+  views/
+routes/
+storage/
+tests/
+```
 
-## Code of Conduct
+Direktori yang paling sering disentuh:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- `routes/web.php`: definisi route public dan endpoint API form
+- `resources/views/pages`: entry page Blade
+- `resources/views/partials`: section per halaman
+- `lang/en` dan `lang/id`: kamus translasi
+- `app/Http/Controllers/TrelloLeadController.php`: integrasi form ke Trello
+- `config/services.php`: konfigurasi kredensial Trello
+- `config/logging.php`: channel log untuk submission form
 
-## Security Vulnerabilities
+## Halaman dan Endpoint
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+| URL | Fungsi |
+| --- | --- |
+| `/` | Homepage |
+| `/iproc-cloud` | Landing page iProc Cloud |
+| `/iproc-cloud/form-success` | Halaman sukses submit form |
+| `/iproc-2go` | Landing page iProc 2Go |
+| `/iproc-2go/privacy-policy` | Privacy policy iProc 2Go |
+| `/id/...` | Versi Bahasa Indonesia dari halaman public |
+| `/api/trello_card.php` | Endpoint submit lead ke Trello |
+| `/up` | Health check Laravel |
 
-## License
+## Kebutuhan Environment
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Minimal environment yang dibutuhkan:
+
+- PHP `^8.3`
+- Composer 2.x
+- Node.js 20+
+- NPM 10+
+- Ekstensi PHP standar Laravel
+- Web server Apache atau Nginx
+
+Environment variable penting:
+
+```env
+APP_ENV=local
+APP_DEBUG=false
+APP_URL=http://localhost
+APP_KEY=
+
+SESSION_DRIVER=file
+CACHE_STORE=file
+QUEUE_CONNECTION=sync
+
+LOG_CHANNEL=stderr
+LOG_LEVEL=info
+
+TRELLO_LEAD_KEY=
+TRELLO_LEAD_TOKEN=
+TRELLO_LEAD_LIST=
+```
+
+Catatan:
+
+- Integrasi form Trello tidak akan berfungsi tanpa `TRELLO_LEAD_KEY`, `TRELLO_LEAD_TOKEN`, dan `TRELLO_LEAD_LIST`.
+- Secara default project ini dapat berjalan dengan SQLite.
+- Saat ini core aplikasi tidak memiliki tabel bisnis khusus selain migration bawaan Laravel.
+
+## Setup Lokal
+
+1. Install dependency backend.
+
+```bash
+composer install
+```
+
+2. Siapkan environment file.
+
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+3. Siapkan database.
+
+```bash
+php artisan migrate
+```
+
+4. Install dependency frontend.
+
+```bash
+npm install
+```
+
+5. Jalankan aplikasi.
+
+```bash
+composer run dev
+```
+
+Command di atas akan menjalankan:
+
+- Laravel development server
+- Queue listener
+- Log tailing
+- Vite dev server
+
+Alternatif cepat:
+
+```bash
+php artisan serve
+npm run dev
+```
+
+## Build Production
+
+```bash
+composer install --no-dev --optimize-autoloader
+npm ci
+npm run build
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+Hasil build frontend akan berada di `public/build`.
+
+## Deployment
+
+Ringkasan langkah deployment:
+
+1. Clone project ke server.
+2. Install dependency Composer tanpa dev dependency.
+3. Install dependency Node lalu build asset.
+4. Siapkan `.env` production dan isi kredensial Trello.
+5. Jalankan migration.
+6. Set document root ke folder `public`.
+7. Pastikan permission `storage` dan `bootstrap/cache` benar.
+8. Cache konfigurasi Laravel.
+
+Panduan lengkap tersedia di [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
+## Logging dan Monitoring
+
+Log utama aplikasi mengikuti `LOG_CHANNEL`.
+
+Khusus lead form `iProc Cloud`, aplikasi menulis log harian ke:
+
+- `storage/logs/iproc-cloud-forms-YYYY-MM-DD.log`
+
+Log ini mencakup:
+
+- payload submission yang sudah dinormalisasi
+- metadata request
+- status sukses atau gagal kirim ke Trello
+- error validasi dan warning custom field
+
+## Testing
+
+Menjalankan test:
+
+```bash
+php artisan test
+```
+
+## Catatan Operasional
+
+- Endpoint `/api/trello_card.php` menerima `POST` dan `OPTIONS`, serta dibebaskan dari CSRF karena dipakai sebagai endpoint form.
+- Controller menggunakan honeypot field untuk mengurangi spam.
+- Header CORS pada endpoint lead saat ini bersifat wildcard (`*`), sehingga perlu ditinjau ulang bila deployment dilakukan di environment dengan pembatasan origin yang ketat.
+
+## Next Improvement
+
+Beberapa pengembangan yang masuk akal untuk fase berikutnya:
+
+- Menambahkan CI/CD pipeline
+- Menambahkan dokumentasi environment per stage
+- Membatasi origin CORS untuk endpoint form
+- Menambahkan observability yang lebih terstruktur
+- Menyelesaikan CMS sederhana sesuai dokumen PRD yang sudah ada
