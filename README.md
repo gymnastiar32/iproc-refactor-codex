@@ -56,7 +56,7 @@ Secara pendekatan teknis, aplikasi ini menggunakan pola server-rendered web appl
 
 | Layer | Teknologi | Keterangan |
 | --- | --- | --- |
-| Backend | PHP 8.3+ dan Laravel 13 | Menangani routing, rendering view, middleware, logging, dan integrasi eksternal. |
+| Backend | PHP 8.3.x dan Laravel 13 | Menangani routing, rendering view, middleware, logging, dan integrasi eksternal. |
 | Templating | Blade | Dipakai untuk layout utama, page entry, dan partial per section. |
 | Frontend Build | Vite 8 | Digunakan untuk build asset CSS dan JavaScript modern. |
 | Styling | Tailwind CSS 4 | Menjadi fondasi styling utama pada asset yang dibangun lewat Vite. |
@@ -181,32 +181,40 @@ TRELLO_LEAD_LIST=
 
 ## 8. Setup Lokal
 
-1. Install dependency backend dengan Composer.
+1. Pastikan runtime lokal menggunakan PHP 8.3.x.
+
+Contoh pada MAMP:
 
 ```bash
-composer install
+/Applications/MAMP/bin/php/php8.3.14/bin/php -v
 ```
 
-2. Salin environment file lalu generate application key.
+2. Install dependency backend dengan Composer.
+
+```bash
+/Applications/MAMP/bin/php/php8.3.14/bin/php /Applications/MAMP/bin/php/composer install
+```
+
+3. Salin environment file lalu generate application key.
 
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-3. Jalankan migration.
+4. Jalankan migration.
 
 ```bash
 php artisan migrate
 ```
 
-4. Install dependency frontend.
+5. Install dependency frontend.
 
 ```bash
 npm install
 ```
 
-5. Jalankan mode development.
+6. Jalankan mode development.
 
 ```bash
 composer run dev
