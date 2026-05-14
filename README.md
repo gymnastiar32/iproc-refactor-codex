@@ -226,6 +226,13 @@ Command tersebut akan menjalankan Laravel server, queue listener, log tailing, d
 
 ### Build production
 
+Sebelum build, pastikan binary `php` yang aktif pada server/deployment runner sudah mengarah ke PHP 8.3.x yang sama dengan runtime aplikasi.
+
+```bash
+php -v
+composer check-platform-reqs
+```
+
 ```bash
 composer install --no-dev --optimize-autoloader
 npm ci
@@ -239,6 +246,7 @@ php artisan view:cache
 
 - Clone repository ke server deployment.
 - Siapkan file `.env` production.
+- Pastikan CLI `php` dan PHP-FPM/web server sama-sama menggunakan PHP 8.3.x.
 - Install dependency Composer tanpa dev package.
 - Install dependency Node dan build asset Vite.
 - Jalankan migration dengan opsi `--force`.
@@ -261,7 +269,7 @@ php artisan view:cache
 
 ### Konfigurasi server
 
-Untuk production, konfigurasi yang direkomendasikan adalah Linux server dengan Nginx atau Apache dan PHP-FPM. Document root wajib diarahkan ke folder `public` dari project Laravel.
+Untuk production, konfigurasi yang direkomendasikan adalah Linux server dengan Nginx atau Apache dan PHP-FPM. Document root wajib diarahkan ke folder `public` dari project Laravel, dan runtime PHP-FPM perlu disetel ke PHP 8.3.x agar konsisten dengan dependency yang dikunci oleh Composer.
 
 ## 10. Logging, Monitoring, dan Operasional
 
