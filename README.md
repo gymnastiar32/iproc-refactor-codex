@@ -235,6 +235,8 @@ composer check-platform-reqs
 
 ```bash
 composer install --no-dev --optimize-autoloader
+cp .env.example .env
+php artisan key:generate
 npm ci
 npm run build
 php artisan config:cache
@@ -246,6 +248,7 @@ php artisan view:cache
 
 - Clone repository ke server deployment.
 - Siapkan file `.env` production.
+- Generate APP_KEY
 - Pastikan CLI `php` dan PHP-FPM/web server sama-sama menggunakan PHP 8.3.x.
 - Install dependency Composer tanpa dev package.
 - Install dependency Node dan build asset Vite.
@@ -259,6 +262,8 @@ php artisan view:cache
 ```bash
 git pull origin <branch>
 composer install --no-dev --optimize-autoloader
+cp .env.example .env
+php artisan key:generate
 npm ci
 npm run build
 php artisan migrate --force
